@@ -1,6 +1,6 @@
 {
   "name": "gopher-client",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A text-based client for the Gopher Internet protocol.",
   "main": "main.js",
   "scripts": {
@@ -15,7 +15,7 @@
   "author": "DusteD",
   "license": "WTFPL",
   "dependencies": {
-    "gopher-lib": "0.0.10"
+    "gopher-lib": "*"
   },
   "bin": {
     "gopher-client": "bin/main.js"
