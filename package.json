@@ -1,0 +1,27 @@
+{
+  "name": "gopher-client",
+  "version": "0.0.1",
+  "description": "A text-based client for the Gopher Internet protocol.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "gopher",
+    "client",
+    "protocol",
+    "retro"
+  ],
+  "author": "DusteD",
+  "license": "WTFPL",
+  "dependencies": {
+    "gopher-lib": "0.0.10"
+  },
+  "bin": {
+    "gopher-client": "bin/main.js"
+  },
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/DusteDdk/gopher-client.git"
+  }
+}
