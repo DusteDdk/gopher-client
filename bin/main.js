@@ -202,7 +202,6 @@ var screen=new Screen();
 var lastReply=null;
 function fetch( r, fileName ) {
 client.get( r, (err, reply)=>{
-	items=[];
 	var num=0;
 	if(err) {
 		console.log(col('red','Error fetching '+r.toShortURI()));
@@ -227,6 +226,7 @@ client.get( r, (err, reply)=>{
 		lastReply=reply;
 		screen.clear();
 		if(reply.directory) {
+			items=[];
 			reply.directory.forEach( (item)=>{
 				if(item.type != 'i' && item.type != '3') {
 					items.push(item);
