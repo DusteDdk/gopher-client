@@ -82,9 +82,8 @@ class History {
 
 var height=process.stdout.rows;
 var width=process.stdout.columns;
-const slack=6;
-process.stdout.on('resize', ()=>{ height=process.stdout.rows; width=process.stdout.columns; });
 
+const slack=6;
 var client = new Gopher.Client();
 //Any arguments?
 var go = process.argv[2] || 'gopher://dusted.dk:70/#DusteDs Home in Cyberspace';
@@ -97,8 +96,17 @@ process.stdin.on('data', (input)=>{
 });
 
 console.log();
-console.log(col('red','gopher-client copyleft (WTFPL) 2017 - DusteD'));
+console.log(col('yellow','gopher-client copyleft (WTFPL) 2017 - DusteD'));
 console.log('Press ? and enter for help.');
+
+if( width && height ) {
+	process.stdout.on('resize', ()=>{ height=process.stdout.rows; width=process.stdout.columns; });
+} else {
+	width=80;
+	height=24;
+	console.log(col('red','Could not get terminal size, fallback to '+width+'x'+height+'.'));
+}
+
 
 var items=[];
 
@@ -174,7 +182,7 @@ class Screen {
 	print(numLines) {
 		var i;
 		if(this.lines.length && this.cur) {
-			console.log('\r\x1b[1A\x1b['+(this.msgLen+2)+'C{Continue}');
+			console.log('\r\x1b[1A\x1b['+(this.msgLen+2)+'C'+col('green','{Continue}'));
 		}
 		var realLines=0;
 		for(i=0; realLines<numLines && i < this.lines.length; ++i) {
