@@ -17,12 +17,69 @@ function col(c, t) {
 	return colorMap[c] + t + colorMap.default;
 }
 
+class Cache {
+	constructor() {
+		this.timeOutMs = 5 * 60 * 1000;
+		this.cleanInterval = 2 * 60 * 1000;
+		this.items = {};
+		this.lastClean = Date.now();
+		this._missNext = false;
+	}
+
+	find(selector) {
+		this._clean();
+
+		if (this._missNext) {
+			this._missNext = false;
+			return null;
+		}
+
+		var key = this._toKey(selector);
+		var item = this.items[key];
+
+
+		return (item) ? item.reply : null;
+	}
+
+
+	add(selector, item) {
+		this._clean();
+		if (!this.find(selector)) {
+			this.items[this._toKey(selector)] = {
+				time: Date.now(),
+				reply: item
+			};
+		}
+	}
+
+	block() {
+		this._missNext = true;
+	}
+
+	_clean() {
+		if (this.lastClean + this.cleanInterval < Date.now()) {
+			this.lastClean = Date.now();
+			Object.keys(this.items).forEach((key) => {
+				var item = this.items[key];
+				if (item.time + this.timeOutMs < this.lastClean) {
+					delete this.items[key];
+				}
+			});
+		}
+	}
+
+	_toKey(selector) {
+		return selector.toURI();
+	}
+}
+
+var cache = new Cache();
 
 class History {
 	constructor() {
 		this.curIdx = 0;
 		this.cur = null;
-		this._blockMerge = false;
+		this.blockMerge = false;
 		this.hist = [];
 	}
 
@@ -57,7 +114,7 @@ class History {
 		}
 
 		this.cur = this.hist[this.curIdx];
-		this._blockMerge = true;
+		this.blockMerge = true;
 		fetch(this.cur);
 	}
 
@@ -72,7 +129,7 @@ class History {
 	}
 
 	merge(res) {
-		if (!this._blockMerge) {
+		if (!this.blockMerge) {
 
 
 			// Erase everything in front of current position
@@ -83,7 +140,7 @@ class History {
 				this.curIdx = this.hist.push(res) - 1;
 			}
 		} else {
-			this._blockMerge = false;
+			this.blockMerge = false;
 		}
 	}
 
@@ -255,7 +312,8 @@ function printHeader(msg, type) {
 var lastReply = null;
 
 function fetch(r, fileName) {
-	client.get(r, (err, reply) => {
+
+	function handleReply(err, reply) {
 		var num = 0;
 		if (err) {
 			console.log(col('red', 'Error fetching ' + r.toShortURI()));
@@ -268,6 +326,9 @@ function fetch(r, fileName) {
 			if (!fileName) {
 				history.merge(r);
 			}
+
+			cache.add(r, reply);
+
 			screen.clear();
 			var msg = reply.request.bytesReceived + ' bytes from ' + reply.request.resource.host + ' (' + reply.request.remoteAddress + ') in ' + reply.request.elapsed + ' ms.';
 			lastReply = reply;
@@ -304,7 +365,16 @@ function fetch(r, fileName) {
 			}
 			screen.print();
 		}
-	}, fileName);
+	}
+
+	//Try to find it in cache first
+	var item = cache.find(r);
+	if (item) {
+		handleReply(null, item);
+	} else {
+		client.get(r, handleReply, fileName);
+	}
+
 }
 
 fetch(go);
@@ -366,6 +436,7 @@ function doCmd(c) {
 			screen.restart();
 			break;
 		case 'R':
+			cache.block();
 			history.setHist();
 			break;
 		case '?':
