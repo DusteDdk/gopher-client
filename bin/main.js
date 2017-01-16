@@ -21,6 +21,7 @@ class History {
 	constructor() {
 		this.curIdx=0;
 		this.cur=null;
+		this._blockMerge=false;
 		this.hist=[];
 	}
 
@@ -55,6 +56,7 @@ class History {
 		}
 
 		this.cur = this.hist[this.curIdx];
+		this._blockMerge=true;
 		fetch(this.cur);
 	}
 
@@ -69,12 +71,18 @@ class History {
 	}
 
 	merge(res) {
-		if( this.cur != res) {
+		if(!this._blockMerge) {
 
-			if( this.hist.indexOf(res) === -1) {
+
+			// Erase everything in front of current position
+			this.hist.splice(this.curIdx+1);
+
+			if( this.cur != res) {
 				this.cur = res;
 				this.curIdx = this.hist.push(res)-1;
 			}
+		} else {
+			this._blockMerge=false;
 		}
 	}
 
@@ -220,12 +228,7 @@ client.get( r, (err, reply)=>{
 		}
 	} else {
 		if(!fileName) {
-			if( r.type !== Gopher.Type.directory)
-			{
-				history.hist.push(r); //Add it to history, but do not move index, it appear in the visited pages, but reloading shows us the menu from which we came
-			} else {
-				history.merge(r);
-			}
+			history.merge(r);
 		}
 		var msg=reply.request.bytesReceived + ' bytes from '+reply.request.resource.host+' ('+reply.request.remoteAddress+') in '+reply.request.elapsed+' ms.';
 		console.log();
