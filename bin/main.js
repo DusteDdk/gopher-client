@@ -319,6 +319,9 @@ function fetch(r, fileName) {
 			console.log(col('red', 'Error fetching ' + r.toShortURI()));
 			if (err.message) {
 				console.log(err.message);
+				if(reply) {
+					console.log('Additional debug info:', reply);
+				}
 			} else {
 				console.error(err);
 			}
@@ -460,7 +463,7 @@ function doCmd(c) {
 
 			if (c[0] == 'g') {
 				c = c.substring(1);
-				if (c[0] === ' ') {
+				while(c[0]===' ') {
 					c = c.substring(1);
 				}
 				try {

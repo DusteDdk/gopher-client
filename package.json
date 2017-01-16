@@ -1,6 +1,6 @@
 {
   "name": "gopher-client",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A text-based client for the Gopher Internet protocol.",
   "main": "main.js",
   "scripts": {
