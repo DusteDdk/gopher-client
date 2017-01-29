@@ -364,7 +364,7 @@ function fetch(r, fileName) {
 				});
 			} else {
 				printHeader(msg, 'Binary');
-				screen.write(col('red', reply.request.bytesReceived + ' bytes was downloade to memory, "S filename" to save'));
+				screen.write(col('red', reply.request.bytesReceived + ' bytes was downloaded to memory, "S filename" to save'));
 			}
 			screen.print();
 		}
